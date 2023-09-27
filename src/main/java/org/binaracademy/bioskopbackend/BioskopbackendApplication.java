@@ -9,9 +9,6 @@ public class BioskopbackendApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.run(BioskopbackendApplication.class, args);
-
-		MovieController movieController = new MovieController();
-		movieController.mainMenu();
 	}
 
 }

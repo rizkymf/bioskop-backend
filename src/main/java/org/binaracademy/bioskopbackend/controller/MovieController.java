@@ -5,15 +5,25 @@ import org.binaracademy.bioskopbackend.repository.MovieRepository;
 import org.binaracademy.bioskopbackend.service.MovieService;
 import org.binaracademy.bioskopbackend.service.MovieServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
+import java.util.Date;
 import java.util.Scanner;
+import java.util.UUID;
 
+@Component
 public class MovieController {
+
+    @PostConstruct
+    public void init() {
+        this.mainMenu();
+    }
 
     private Scanner scanner = new Scanner(System.in);
 
     @Autowired
-    private MovieService movieService;
+    public MovieService movieService;
 
     public void mainMenu() {
         System.out.println("Welcome to Bioskop Binar!!\n" +
@@ -23,10 +33,19 @@ public class MovieController {
                 "0. Keluar");
         System.out.print("=> ");
         int pilihan = scanner.nextInt();
-        if(pilihan == 1) {
-            this.showFilmSedangTayang();
+        switch(pilihan) {
+            case 1:
+                this.showFilmSedangTayang();
+                break;
+            case 2:
+                this.addNewMovie();
+                break;
+            case 0:
+                System.exit(0);
+            default:
+                System.out.println("Pilihan dengan benar coy\n!!!!!!!!!!!");
+                this.mainMenu();
         }
-        System.exit(0);
     }
 
     public void showFilmSedangTayang() {
@@ -45,7 +64,7 @@ public class MovieController {
         System.out.println("Nama Film : " + movie.getName());
         System.out.println("Poster Image : " + movie.getImage());
         System.out.println("Jadwal Tayang : " + movie.getSchedule());
-        System.out.println("Seat tersedia : " + movie.getSeat().get(0));
+        System.out.println("Seat tersedia : " + movie.getSeat());
         System.out.println("Sinopsis : " + movie.getSynopsis());
         System.out.println();
         System.out.println("1. Kembali ke menu utama");
@@ -56,6 +75,32 @@ public class MovieController {
             this.mainMenu();
         }
         System.exit(0);
+    }
+
+    public void addNewMovie() {
+        scanner.nextLine();
+        System.out.print("Nama Film : ");
+        String movieName = scanner.nextLine();
+        System.out.print("Poster Image : ");
+        String urlImagePoster = scanner.nextLine();
+//        System.out.print("Jadwal Tayang : ");
+//        String schedule = scanner.nextLine();
+        System.out.print("Seat tersedia : ");
+        String seat = scanner.nextLine();
+        System.out.print("Sinopsis : ");
+        String synopsis = scanner.nextLine();
+
+        Movie newMovie = Movie.builder()
+                .id(UUID.randomUUID().toString())
+                .name(movieName)
+                .image(urlImagePoster)
+                .schedule(new Date())
+                .seat(seat)
+                .synopsis(synopsis)
+                .build();
+        movieService.addNewMovie(newMovie);
+        System.out.println("\nFilm baru berhasil di tambahkan!");
+        this.mainMenu();
     }
 
 }
