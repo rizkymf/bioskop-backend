@@ -28,8 +28,9 @@ public class Movie implements Serializable {
 
     @Id
     @GeneratedValue(generator = "UUID")
-    @GenericGenerator(name = "UUID",
-    strategy = "org.hibernate.id.UUIDGenerator")
+    @GenericGenerator(
+            name = "UUID",
+            strategy = "org.hibernate.id.UUIDGenerator")
     private String id;
 
     @Column(name = "name", length = 100)
