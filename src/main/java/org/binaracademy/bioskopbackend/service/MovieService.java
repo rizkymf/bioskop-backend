@@ -10,7 +10,8 @@ import java.util.List;
 public interface MovieService {
 
     List<Movie> getMovieCurrentlyShowing(Date date);
+    List<Movie> getMovieCurrentlyShowingWithFilterSeat(Date date, String seat);
     Boolean addNewMovie(Movie movie);
-    Movie getMovieDetail(int movieIndex);
+    Movie getMovieDetail(String selectedMovieName);
 
 }

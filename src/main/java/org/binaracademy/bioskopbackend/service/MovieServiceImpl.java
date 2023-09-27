@@ -21,11 +21,12 @@ public class MovieServiceImpl implements MovieService {
     public List<Movie> getMovieCurrentlyShowing(Date date) {
         Date requestDate = Optional.ofNullable(date)
                 .orElse(new Date());
-        return movieRepository.findAll();
-//        return null;
-//        return movieRepository.getMovies().stream()
-//                .filter(movie -> movie.getSchedule().after(requestDate))
-//                .collect(Collectors.toList());
+        return movieRepository.getMoviesOnSchedule(requestDate);
+    }
+
+    @Override
+    public List<Movie> getMovieCurrentlyShowingWithFilterSeat(Date date, String seat) {
+        return null;
     }
 
     @Override
@@ -37,8 +38,9 @@ public class MovieServiceImpl implements MovieService {
     }
 
     @Override
-    public Movie getMovieDetail(int movieIndex) {
-        return null;
+    public Movie getMovieDetail(String selectedMovieName) {
+        // TODO : ambil data movie, berdasarkan nama movie nya
+        return movieRepository.findByName(selectedMovieName);
 //        return movieRepository.getMovies().get(movieIndex - 1);
     }
 

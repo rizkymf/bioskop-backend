@@ -8,7 +8,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 import java.util.Scanner;
 import java.util.UUID;
 
@@ -16,7 +19,7 @@ import java.util.UUID;
 public class MovieController {
 
     @PostConstruct
-    public void init() {
+    public void init() throws ParseException {
         this.mainMenu();
     }
 
@@ -25,7 +28,7 @@ public class MovieController {
     @Autowired
     public MovieService movieService;
 
-    public void mainMenu() {
+    public void mainMenu() throws ParseException {
         System.out.println("Welcome to Bioskop Binar!!\n" +
                 "Silahkan pilih menu\n" +
                 "1. Lihat film sedang tayang\n" +
@@ -33,6 +36,7 @@ public class MovieController {
                 "0. Keluar");
         System.out.print("=> ");
         int pilihan = scanner.nextInt();
+        scanner.nextLine();
         switch(pilihan) {
             case 1:
                 this.showFilmSedangTayang();
@@ -48,19 +52,22 @@ public class MovieController {
         }
     }
 
-    public void showFilmSedangTayang() {
+    public void showFilmSedangTayang() throws ParseException {
         System.out.println("Berikut adalah film yang sedang tayang saat ini");
         System.out.println("Nama Film \t | \t Jadwal \t | \t Sinopsis");
-        movieService.getMovieCurrentlyShowing(null).forEach(movie -> {
+        List<Movie> movies = movieService.getMovieCurrentlyShowing(null);
+        movies.forEach(movie -> {
             System.out.println(movie.getName() + " \t | \t " + movie.getSchedule() + "\t | \t" + movie.getSynopsis());
         });
-        System.out.println("Pilih film yang ingin dilihat lebih detil => ");
+        System.out.print("Pilih film yang ingin dilihat lebih detil => ");
         int pilihan = scanner.nextInt();
-        this.showFilmDetail(pilihan);
+        scanner.nextLine();
+        String selectedMovie = movies.get(pilihan-1).getName();
+        this.showFilmDetail(selectedMovie);
     }
 
-    public void showFilmDetail(int input) {
-        Movie movie = movieService.getMovieDetail(input);
+    public void showFilmDetail(String selectedMovieName) throws ParseException {
+        Movie movie = movieService.getMovieDetail(selectedMovieName);
         System.out.println("Nama Film : " + movie.getName());
         System.out.println("Poster Image : " + movie.getImage());
         System.out.println("Jadwal Tayang : " + movie.getSchedule());
@@ -77,24 +84,22 @@ public class MovieController {
         System.exit(0);
     }
 
-    public void addNewMovie() {
-        scanner.nextLine();
+    public void addNewMovie() throws ParseException {
         System.out.print("Nama Film : ");
         String movieName = scanner.nextLine();
         System.out.print("Poster Image : ");
         String urlImagePoster = scanner.nextLine();
-//        System.out.print("Jadwal Tayang : ");
-//        String schedule = scanner.nextLine();
+        System.out.print("Jadwal Tayang : ");
+        String schedule = scanner.nextLine();
         System.out.print("Seat tersedia : ");
         String seat = scanner.nextLine();
         System.out.print("Sinopsis : ");
         String synopsis = scanner.nextLine();
 
         Movie newMovie = Movie.builder()
-                .id(UUID.randomUUID().toString())
                 .name(movieName)
                 .image(urlImagePoster)
-                .schedule(new Date())
+                .schedule(new SimpleDateFormat("yyyy-MM-dd hh:mm:ss").parse(schedule))
                 .seat(seat)
                 .synopsis(synopsis)
                 .build();
