@@ -1,6 +1,7 @@
 package org.binaracademy.bioskopbackend.controller;
 
 import org.binaracademy.bioskopbackend.model.Movie;
+import org.binaracademy.bioskopbackend.model.response.MovieResponse;
 import org.binaracademy.bioskopbackend.repository.MovieRepository;
 import org.binaracademy.bioskopbackend.service.MovieService;
 import org.binaracademy.bioskopbackend.service.MovieServiceImpl;
@@ -12,6 +13,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 import java.util.Scanner;
 import java.util.UUID;
 
@@ -54,10 +56,10 @@ public class MovieController {
 
     public void showFilmSedangTayang() throws ParseException {
         System.out.println("Berikut adalah film yang sedang tayang saat ini");
-        System.out.println("Nama Film \t | \t Jadwal \t | \t Sinopsis");
+        System.out.println("Nama Film \t | \t Sinopsis");
         List<Movie> movies = movieService.getMovieCurrentlyShowing(null);
         movies.forEach(movie -> {
-            System.out.println(movie.getName() + " \t | \t " + movie.getSchedule() + "\t | \t" + movie.getSynopsis());
+            System.out.println(movie.getName() + "\t | \t" + movie.getSynopsis());
         });
         System.out.print("Pilih film yang ingin dilihat lebih detil => ");
         int pilihan = scanner.nextInt();
@@ -67,14 +69,25 @@ public class MovieController {
     }
 
     public void showFilmDetail(String selectedMovieName) throws ParseException {
-        Movie movie = movieService.getMovieDetail(selectedMovieName);
-        System.out.println("Nama Film : " + movie.getName());
-        System.out.println("Poster Image : " + movie.getImage());
-        System.out.println("Jadwal Tayang : " + movie.getSchedule());
-        System.out.println("Seat tersedia : " + movie.getSeat());
+        MovieResponse movie = movieService.getMovieDetail(selectedMovieName);
+        System.out.println("Nama Film : " + movie.getMovieName());
+        System.out.println("Poster Image : " + movie.getPosterImage());
         System.out.println("Sinopsis : " + movie.getSynopsis());
+        System.out.println("==========================================");
+        System.out.println("Studio : " + movie.getSchedules().stream()
+                .filter(Objects::nonNull).findFirst()
+                .map(schedule -> schedule.getStudio().getStudioName())
+                .orElse("Studio tidak ditemukan"));
+        System.out.println("Jadwal yang tersedia : ");
+        // TODO: bikin fetch to schedule
+        System.out.println("No. Mulai \t | \t Selesai");
+        movie.getSchedules().forEach(schedule -> {
+            System.out.println(movie.getSchedules().indexOf(schedule) + ". " + schedule.getStartTime() + " \t | \t " + schedule.getEndTime());
+        });
         System.out.println();
         System.out.println("1. Kembali ke menu utama");
+        System.out.println("2. Edit Detail Film");
+        System.out.println("3. Hapus Film Ini");
         System.out.println("0. Keluar");
         System.out.print("=> ");
         int pilihan = scanner.nextInt();
@@ -98,14 +111,22 @@ public class MovieController {
 
         Movie newMovie = Movie.builder()
                 .name(movieName)
-                .image(urlImagePoster)
-                .schedule(new SimpleDateFormat("yyyy-MM-dd hh:mm:ss").parse(schedule))
-                .seat(seat)
+                .posterImage(urlImagePoster)
+//                .schedule(new SimpleDateFormat("yyyy-MM-dd hh:mm:ss").parse(schedule))
+//                .seat(seat)
                 .synopsis(synopsis)
                 .build();
         movieService.addNewMovie(newMovie);
         System.out.println("\nFilm baru berhasil di tambahkan!");
         this.mainMenu();
+    }
+
+    public void updateMovie(String selectedMovieName) {
+        // TODO : do update
+    }
+
+    public void deleteMovie(String selectedMovieName) {
+        // TODO: do delete movie by movie name
     }
 
 }

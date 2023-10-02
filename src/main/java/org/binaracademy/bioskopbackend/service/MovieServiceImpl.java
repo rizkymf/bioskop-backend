@@ -1,6 +1,7 @@
 package org.binaracademy.bioskopbackend.service;
 
 import org.binaracademy.bioskopbackend.model.Movie;
+import org.binaracademy.bioskopbackend.model.response.MovieResponse;
 import org.binaracademy.bioskopbackend.repository.MovieRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -9,7 +10,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 public class MovieServiceImpl implements MovieService {
@@ -38,10 +38,17 @@ public class MovieServiceImpl implements MovieService {
     }
 
     @Override
-    public Movie getMovieDetail(String selectedMovieName) {
+    public MovieResponse getMovieDetail(String selectedMovieName) {
         // TODO : ambil data movie, berdasarkan nama movie nya
-        return movieRepository.findByName(selectedMovieName);
-//        return movieRepository.getMovies().get(movieIndex - 1);
+        return Optional.ofNullable(movieRepository.findByName(selectedMovieName))
+                .map(movie -> MovieResponse.builder()
+                        .movieName(movie.getName())
+                        .movieCode(movie.getMovieCode())
+                        .posterImage(movie.getPosterImage())
+                        .synopsis(movie.getSynopsis())
+                        .schedules(movie.getSchedules())
+                        .build())
+                .orElse(null);
     }
 
 }

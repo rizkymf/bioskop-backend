@@ -11,7 +11,9 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
@@ -36,14 +38,24 @@ public class Movie implements Serializable {
     @Column(name = "name", length = 100)
     private String name;
 
-    @Column(name = "image_url")
-    private String image;
+    @Column(name = "movie_code", length = 20)
+    private String movieCode;
 
-    @Column(name = "schedule")
-    private Date schedule;
+    @Column(name = "poster_image")
+    private String posterImage;
 
-    private String seat;
-
+    // Sebetulnya ga perlu pake @Column.
     private String synopsis;
+
+    @OneToMany
+    private List<Schedule> schedules;
+
+    @Transient
+    private String isAccessed;
+
+//    @Column(name = "schedule")
+//    private Date schedule;
+
+//    private String seat;
 
 }
