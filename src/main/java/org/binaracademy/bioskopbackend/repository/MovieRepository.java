@@ -2,6 +2,8 @@ package org.binaracademy.bioskopbackend.repository;
 
 import lombok.Data;
 import org.binaracademy.bioskopbackend.model.Movie;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -23,6 +25,15 @@ public interface MovieRepository extends JpaRepository<Movie, String> {
                     "join schedule on schedule.movie_id = movie.id " +
                     "where schedule.start_time <= :schedule and schedule.end_time >= :schedule")
     List<Movie> getMoviesOnSchedule(@Param("schedule") Date schedule);
+
+    @Query(nativeQuery = true,
+            value = "select * from movie " +
+                    "join schedule on schedule.movie_id = movie.id " +
+                    "where schedule.start_time <= :schedule and schedule.end_time >= :schedule")
+    List<Movie> getMoviesOnSchedulePaged(@Param("schedule") Date schedule, Pageable pageable);
+
+    @Query(nativeQuery = true, value = "select * from movie")
+    Page<Movie> findAllWithPaging(Pageable pageable);
 
 
 //    Movie getMovieDetail()

@@ -1,40 +1,53 @@
 package org.binaracademy.bioskopbackend.controller;
 
+import lombok.extern.slf4j.Slf4j;
 import org.binaracademy.bioskopbackend.model.Movie;
 import org.binaracademy.bioskopbackend.model.response.MovieResponse;
-import org.binaracademy.bioskopbackend.repository.MovieRepository;
 import org.binaracademy.bioskopbackend.service.MovieService;
-import org.binaracademy.bioskopbackend.service.MovieServiceImpl;
+import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.util.InputMismatchException;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Scanner;
-import java.util.UUID;
 
 @Component
+@Slf4j
 public class MovieController {
 
-    @PostConstruct
-    public void init() throws ParseException {
-        this.mainMenu();
-    }
+//    private Logger log;
+
+//    @PostConstruct
+//    public void init() throws ParseException {
+//        this.mainMenu();
+//    }
 
     private Scanner scanner = new Scanner(System.in);
 
     @Autowired
     public MovieService movieService;
 
+    public void separator() {
+        System.out.println("===============================================");
+    }
+
     public void mainMenu() throws ParseException {
+        log.trace("Ini level trace");
+        log.debug("ini level debug");
+        log.info("Processing mainMenu() -- ini level info");
+        log.warn("ini level warn");
+        log.error("ini level error");
         System.out.println("Welcome to Bioskop Binar!!\n" +
                 "Silahkan pilih menu\n" +
                 "1. Lihat film sedang tayang\n" +
                 "2. Tambahkan film\n" +
+                "3. Lihat semua film\n" +
                 "0. Keluar");
         System.out.print("=> ");
         int pilihan = scanner.nextInt();
@@ -46,6 +59,9 @@ public class MovieController {
             case 2:
                 this.addNewMovie();
                 break;
+            case 3:
+                this.getAllMovie(null);
+                break;
             case 0:
                 System.exit(0);
             default:
@@ -54,7 +70,34 @@ public class MovieController {
         }
     }
 
+    public void getAllMovie(Page<Movie> movies) throws ParseException {
+        this.separator();
+        System.out.println("Berikut adalah semua film yang kami punya");
+        System.out.println("Nama Film \t | \t Sinopsis");
+        movies = Optional.ofNullable(movies)
+                        .orElseGet(() -> movieService.getMoviePaged(0));
+        movies.forEach(movie -> {
+            System.out.println(movie.getName() + "\t | \t" + movie.getSynopsis());
+        });
+        this.separator();
+        System.out.println("Halaman : " + (movies.getPageable().getPageNumber() + 1));
+        System.out.println("Total halaman : " + movies.getTotalPages());
+        System.out.println("Jumlah data : " + movies.getTotalElements());
+        System.out.println("Kembali : " + movies.hasPrevious());
+        System.out.println("Lanjut : " + movies.hasNext());
+        System.out.print("Masukkan halaman yang ingin anda tuju, Ketik \"n\" jika ingin keluar => ");
+        try {
+            int pilihan = scanner.nextInt() - 1;
+            scanner.nextLine();
+            movies = movieService.getMoviePaged(pilihan);
+            this.getAllMovie(movies);
+        } catch(InputMismatchException e) {
+            this.mainMenu();
+        }
+    }
+
     public void showFilmSedangTayang() throws ParseException {
+        this.separator();
         System.out.println("Berikut adalah film yang sedang tayang saat ini");
         System.out.println("Nama Film \t | \t Sinopsis");
         List<Movie> movies = movieService.getMovieCurrentlyShowing(null);

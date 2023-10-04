@@ -6,36 +6,41 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.GenericGenerator;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
-import javax.persistence.Transient;
+import javax.persistence.UniqueConstraint;
 import java.io.Serializable;
-import java.util.Date;
 import java.util.List;
 
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@Entity
-@Table(name = "movie") // OPTIONAL, bisa digunakan untuk memberikan nama table yg berbeda nama class
+@Entity // Menandakan bahwa POJO class ini merepresent table pada database
+@Table(name = "movie",
+        uniqueConstraints = {
+            @UniqueConstraint(columnNames = {"movie_code", "name"}),
+            @UniqueConstraint(columnNames = "poster_image")
+        }) // OPTIONAL, bisa digunakan untuk memberikan nama table yg berbeda nama class
 public class Movie implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @Id
-    @GeneratedValue(generator = "UUID")
+    @Id // Menandakan ini adalah column pk
+    @GeneratedValue(generator = "UUID") // Column ini jika kosong akan di generate otomatis value nya
     @GenericGenerator(
             name = "UUID",
-            strategy = "org.hibernate.id.UUIDGenerator")
+            strategy = "org.hibernate.id.UUIDGenerator") // Generator value di column jika kosong
     private String id;
 
-    @Column(name = "name", length = 100)
+//    @Column(name = "name", length = 100) // Penanda column pada table sekaligus konfigurasi spec pada kolom tsb.
+    @Column(name = "name", length = 100, unique = true)
     private String name;
 
     @Column(name = "movie_code", length = 20)
@@ -47,11 +52,12 @@ public class Movie implements Serializable {
     // Sebetulnya ga perlu pake @Column.
     private String synopsis;
 
-    @OneToMany
+    @OneToMany(cascade = CascadeType.DETACH, mappedBy = "movie_id") // menunjukkan bahwa kelas Movie memiliki hubungan One To Many dengan Schedules
+    @JoinColumn(referencedColumnName = "movie_id")
     private List<Schedule> schedules;
 
-    @Transient
-    private String isAccessed;
+//    @Transient // Java akan skip field ini dan tidak direpresentasikan sebagai kolom di table.
+//    private String isAccessed;
 
 //    @Column(name = "schedule")
 //    private Date schedule;
