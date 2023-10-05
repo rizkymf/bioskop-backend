@@ -52,8 +52,7 @@ public class Movie implements Serializable {
     // Sebetulnya ga perlu pake @Column.
     private String synopsis;
 
-    @OneToMany(cascade = CascadeType.DETACH, mappedBy = "movie_id") // menunjukkan bahwa kelas Movie memiliki hubungan One To Many dengan Schedules
-    @JoinColumn(referencedColumnName = "movie_id")
+    @OneToMany(cascade = CascadeType.DETACH, mappedBy = "movie") // menunjukkan bahwa kelas Movie memiliki hubungan One To Many dengan Schedules
     private List<Schedule> schedules;
 
 //    @Transient // Java akan skip field ini dan tidak direpresentasikan sebagai kolom di table.

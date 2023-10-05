@@ -34,6 +34,6 @@ public class Studio implements Serializable {
     @Column(length = 20)
     private String studioName;
 
-    @OneToMany
+    @OneToMany(mappedBy = "studio")
     private List<Schedule> schedules;
 }
