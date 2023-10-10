@@ -14,10 +14,8 @@ import java.util.List;
 @NoArgsConstructor
 public class MovieResponse {
 
-    private String movieName;
-    private String movieCode;
-    private String posterImage;
-    private String synopsis;
-    private List<Schedule> schedules;
+    private String id;
+    private String name;
+    private String img;
 
 }

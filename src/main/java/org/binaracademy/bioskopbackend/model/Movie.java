@@ -4,11 +4,15 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.binaracademy.bioskopbackend.enumeration.MoviePhase;
+import org.binaracademy.bioskopbackend.enumeration.MovieStatus;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
@@ -62,5 +66,19 @@ public class Movie implements Serializable {
 //    private Date schedule;
 
 //    private String seat;
+
+    @Enumerated(EnumType.STRING)
+    private MovieStatus movieStatus;
+
+    @Enumerated(EnumType.ORDINAL)
+    private MoviePhase moviePhase;
+
+
+    // movie1, movie2, movie3
+    // schedule11, schedule12, ...
+
+    // a, b, c, d, e
+    // String data = a, b, c ...
+    // a...a5, b...b3, c...c5
 
 }

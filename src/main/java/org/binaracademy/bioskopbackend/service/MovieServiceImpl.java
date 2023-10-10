@@ -13,6 +13,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -20,6 +21,17 @@ public class MovieServiceImpl implements MovieService {
 
     @Autowired
     private MovieRepository movieRepository;
+
+    @Override
+    public List<MovieResponse> getAllMovie() {
+        return movieRepository.findAll().stream()
+                .map(movie -> MovieResponse.builder()
+                        .id(movie.getId())
+                        .name(movie.getName())
+                        .img(movie.getPosterImage())
+                        .build())
+                .collect(Collectors.toList());
+    }
 
     @Override
     public List<Movie> getMovieCurrentlyShowing(Date date) {
@@ -58,11 +70,9 @@ public class MovieServiceImpl implements MovieService {
         // TODO : ambil data movie, berdasarkan nama movie nya
         return Optional.ofNullable(movieRepository.findByName(selectedMovieName))
                 .map(movie -> MovieResponse.builder()
-                        .movieName(movie.getName())
-                        .movieCode(movie.getMovieCode())
-                        .posterImage(movie.getPosterImage())
-                        .synopsis(movie.getSynopsis())
-                        .schedules(movie.getSchedules())
+                        .id(movie.getId())
+                        .name(movie.getName())
+                        .img(movie.getPosterImage())
                         .build())
                 .orElse(null);
     }
@@ -70,6 +80,38 @@ public class MovieServiceImpl implements MovieService {
     @Override
     public Page<Movie> getMoviePaged(int page) {
         return movieRepository.findAllWithPaging(PageRequest.of(page, 2));
+    }
+
+    @Override
+    public Boolean submitMovie(Movie movie) {
+        try {
+            movieRepository.submitNewMovie(movie.getId(), movie.getName(), movie.getPosterImage(), movie.getSynopsis());
+            return true;
+        } catch(Exception e) {
+            return false;
+        }
+    }
+
+    @Override
+    public Boolean updateMovieName(String oldName, String newName) {
+        try{
+            movieRepository.editMovieName(oldName, newName);
+            return true;
+        } catch(Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    @Override
+    public Boolean deleteMovieFromName(String name) {
+        try {
+            movieRepository.deleteMovieFromName(name);
+            return true;
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 
 }

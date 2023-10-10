@@ -10,13 +10,8 @@ import java.text.ParseException;
 @SpringBootApplication
 public class BioskopbackendApplication {
 
-	@Autowired
-	static MovieController movieController;
-
 	public static void main(String[] args) throws ParseException {
 		SpringApplication.run(BioskopbackendApplication.class, args);
-
-		movieController.mainMenu();
 	}
 
 }
