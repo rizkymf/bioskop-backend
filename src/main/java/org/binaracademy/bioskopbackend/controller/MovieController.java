@@ -45,6 +45,7 @@ public class MovieController {
     @GetMapping(produces = "application/json")
     @Operation(summary = "Api to get all movies")
     public List<MovieResponse> getMovies() {
+        log.info("getting all movies in controller");
         return movieService.getAllMovie();
     }
 
