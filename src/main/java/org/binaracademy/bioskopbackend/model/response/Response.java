@@ -4,18 +4,15 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.binaracademy.bioskopbackend.model.Schedule;
-
-import java.util.List;
 
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class MovieResponse {
+public class Response<T> {
 
-    private String id;
-    private String name;
-    private String img;
+    private T data;
+    private boolean isSuccess;
+    private ErrorResponse error;
 
 }

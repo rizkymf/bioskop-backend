@@ -1,175 +1,106 @@
 package org.binaracademy.bioskopbackend.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.extern.slf4j.Slf4j;
 import org.binaracademy.bioskopbackend.model.Movie;
+import org.binaracademy.bioskopbackend.model.response.ErrorResponse;
 import org.binaracademy.bioskopbackend.model.response.MovieResponse;
+import org.binaracademy.bioskopbackend.model.response.Response;
 import org.binaracademy.bioskopbackend.service.MovieService;
-import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.stereotype.Component;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
-import javax.annotation.PostConstruct;
-import java.text.ParseException;
-import java.util.InputMismatchException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.Scanner;
+import java.util.stream.Collectors;
 
-@Component
+@CrossOrigin("*")
+@RestController
+@RequestMapping(value = "/api/movies")
 @Slf4j
 public class MovieController {
 
-//    private Logger log;
-
-//    @PostConstruct
-//    public void init() throws ParseException {
-//        this.mainMenu();
-//    }
-
-    private Scanner scanner = new Scanner(System.in);
-
     @Autowired
-    public MovieService movieService;
+    MovieService movieService;
 
-    public void separator() {
-        System.out.println("===============================================");
+//    @RequestMapping(value = "/get-movies", method = RequestMethod.GET, produces = "application/json")
+    @GetMapping(produces = "application/json")
+    @Operation(summary = "Api to get all movies")
+    public List<MovieResponse> getMovies() {
+        return movieService.getAllMovie();
     }
 
-    public void mainMenu() throws ParseException {
-        log.trace("Ini level trace");
-        log.debug("ini level debug");
-        log.info("Processing mainMenu() -- ini level info");
-        log.warn("ini level warn");
-        log.error("ini level error");
-        System.out.println("Welcome to Bioskop Binar!!\n" +
-                "Silahkan pilih menu\n" +
-                "1. Lihat film sedang tayang\n" +
-                "2. Tambahkan film\n" +
-                "3. Lihat semua film\n" +
-                "0. Keluar");
-        System.out.print("=> ");
-        int pilihan = scanner.nextInt();
-        scanner.nextLine();
-        switch(pilihan) {
-            case 1:
-                this.showFilmSedangTayang();
-                break;
-            case 2:
-                this.addNewMovie();
-                break;
-            case 3:
-                this.getAllMovie(null);
-                break;
-            case 0:
-                System.exit(0);
-            default:
-                System.out.println("Pilihan dengan benar coy\n!!!!!!!!!!!");
-                this.mainMenu();
+//    @RequestMapping(method = RequestMethod.POST, value = "/add", consumes = "application/json")
+    @PostMapping(consumes = "application/json", produces = "application/json")
+    public String addNewMovies(@RequestBody Movie movie) {
+        movieService.submitMovie(movie);
+        return "Add new movies successful!";
+    }
+
+    @RequestMapping(method = RequestMethod.DELETE, value = "/delete/{movieName}")
+    public String deleteMovie(@PathVariable("movieName") String movieName) {
+        movieService.deleteMovieFromName(movieName);
+        return "Delete movie " + movieName + " success!";
+    }
+
+//    @RequestMapping(method = RequestMethod.GET, value = "api/movies/detail")
+    @GetMapping(value = "/detail")
+    @Operation(summary = "Getting detail of one movies by movie name")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Movie found"),
+            @ApiResponse(responseCode = "404", description = "Inputted movie name not found")
+    })
+    public ResponseEntity getMovieDetail(@Parameter(description = "movie name to find")
+    @Schema(example = "Spiderman 3")
+    @RequestParam("movieName") String movieName) {
+        MovieResponse response = movieService.getMovieDetail(movieName);
+        log.debug("Movie detail with name {} fetched with detail {}", movieName, response);
+        if(Objects.nonNull(response)) {
+            return new ResponseEntity<>(Response.builder()
+                    .data(movieService.getMovieDetail(movieName))
+                    .isSuccess(Boolean.TRUE)
+                    .build(), HttpStatus.OK);
         }
+        return new ResponseEntity<>(Response.builder()
+                .error(ErrorResponse.builder()
+                        .errorMessage("Movie with name " + movieName + " not found")
+                        .errorCode(HttpStatus.NOT_FOUND.value())
+                        .build())
+                .data(null)
+                .isSuccess(Boolean.FALSE)
+                .build(), HttpStatus.NOT_FOUND);
+//        return movieService.getMovieDetail(movieName);
     }
 
-    public void getAllMovie(Page<Movie> movies) throws ParseException {
-        this.separator();
-        System.out.println("Berikut adalah semua film yang kami punya");
-        System.out.println("Nama Film \t | \t Sinopsis");
-        movies = Optional.ofNullable(movies)
-                        .orElseGet(() -> movieService.getMoviePaged(0));
-        movies.forEach(movie -> {
-            System.out.println(movie.getName() + "\t | \t" + movie.getSynopsis());
-        });
-        this.separator();
-        System.out.println("Halaman : " + (movies.getPageable().getPageNumber() + 1));
-        System.out.println("Total halaman : " + movies.getTotalPages());
-        System.out.println("Jumlah data : " + movies.getTotalElements());
-        System.out.println("Kembali : " + movies.hasPrevious());
-        System.out.println("Lanjut : " + movies.hasNext());
-        System.out.print("Masukkan halaman yang ingin anda tuju, Ketik \"n\" jika ingin keluar => ");
-        try {
-            int pilihan = scanner.nextInt() - 1;
-            scanner.nextLine();
-            movies = movieService.getMoviePaged(pilihan);
-            this.getAllMovie(movies);
-        } catch(InputMismatchException e) {
-            this.mainMenu();
-        }
+    @RequestMapping(method = RequestMethod.PUT, value = "/update/{movieName}")
+    public String updateMovie(@RequestParam("newMovieName") String newMovieName,
+            @PathVariable("movieName") String oldMovieName,
+            @RequestHeader("Accept-Languange") String acceptLanguage,
+            @RequestBody Movie movie) {
+        log.info("Accept-Language - {}", acceptLanguage);
+        movieService.updateMovieName(oldMovieName, newMovieName);
+        return "update movie successful!";
     }
 
-    public void showFilmSedangTayang() throws ParseException {
-        this.separator();
-        System.out.println("Berikut adalah film yang sedang tayang saat ini");
-        System.out.println("Nama Film \t | \t Sinopsis");
-        List<Movie> movies = movieService.getMovieCurrentlyShowing(null);
-        movies.forEach(movie -> {
-            System.out.println(movie.getName() + "\t | \t" + movie.getSynopsis());
-        });
-        System.out.print("Pilih film yang ingin dilihat lebih detil => ");
-        int pilihan = scanner.nextInt();
-        scanner.nextLine();
-        String selectedMovie = movies.get(pilihan-1).getName();
-        this.showFilmDetail(selectedMovie);
+    private List<?> testWildCard() {
+        return Arrays.asList("String", 40);
     }
-
-    public void showFilmDetail(String selectedMovieName) throws ParseException {
-        MovieResponse movie = movieService.getMovieDetail(selectedMovieName);
-        System.out.println("Nama Film : " + movie.getMovieName());
-        System.out.println("Poster Image : " + movie.getPosterImage());
-        System.out.println("Sinopsis : " + movie.getSynopsis());
-        System.out.println("==========================================");
-        System.out.println("Studio : " + movie.getSchedules().stream()
-                .filter(Objects::nonNull).findFirst()
-                .map(schedule -> schedule.getStudio().getStudioName())
-                .orElse("Studio tidak ditemukan"));
-        System.out.println("Jadwal yang tersedia : ");
-        // TODO: bikin fetch to schedule
-        System.out.println("No. Mulai \t | \t Selesai");
-        movie.getSchedules().forEach(schedule -> {
-            System.out.println(movie.getSchedules().indexOf(schedule) + ". " + schedule.getStartTime() + " \t | \t " + schedule.getEndTime());
-        });
-        System.out.println();
-        System.out.println("1. Kembali ke menu utama");
-        System.out.println("2. Edit Detail Film");
-        System.out.println("3. Hapus Film Ini");
-        System.out.println("0. Keluar");
-        System.out.print("=> ");
-        int pilihan = scanner.nextInt();
-        if(pilihan == 1) {
-            this.mainMenu();
-        }
-        System.exit(0);
-    }
-
-    public void addNewMovie() throws ParseException {
-        System.out.print("Nama Film : ");
-        String movieName = scanner.nextLine();
-        System.out.print("Poster Image : ");
-        String urlImagePoster = scanner.nextLine();
-        System.out.print("Jadwal Tayang : ");
-        String schedule = scanner.nextLine();
-        System.out.print("Seat tersedia : ");
-        String seat = scanner.nextLine();
-        System.out.print("Sinopsis : ");
-        String synopsis = scanner.nextLine();
-
-        Movie newMovie = Movie.builder()
-                .name(movieName)
-                .posterImage(urlImagePoster)
-//                .schedule(new SimpleDateFormat("yyyy-MM-dd hh:mm:ss").parse(schedule))
-//                .seat(seat)
-                .synopsis(synopsis)
-                .build();
-        movieService.addNewMovie(newMovie);
-        System.out.println("\nFilm baru berhasil di tambahkan!");
-        this.mainMenu();
-    }
-
-    public void updateMovie(String selectedMovieName) {
-        // TODO : do update
-    }
-
-    public void deleteMovie(String selectedMovieName) {
-        // TODO: do delete movie by movie name
-    }
-
 }

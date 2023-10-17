@@ -11,10 +11,15 @@ import java.util.List;
 @Service
 public interface MovieService {
 
+    List<MovieResponse> getAllMovie();
+    List<Movie> getAllMovieOri();
     List<Movie> getMovieCurrentlyShowing(Date date);
     List<Movie> getMovieCurrentlyShowingWithFilterSeat(Date date, String seat);
     Boolean addNewMovie(Movie movie);
     MovieResponse getMovieDetail(String selectedMovieName);
     Page<Movie> getMoviePaged(int page);
+    Boolean submitMovie(Movie movie);
+    Boolean updateMovieName(String oldName, String newName);
+    Boolean deleteMovieFromName(String name);
 
 }
