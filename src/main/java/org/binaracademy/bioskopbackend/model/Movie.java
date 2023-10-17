@@ -13,6 +13,7 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
@@ -56,7 +57,11 @@ public class Movie implements Serializable {
     // Sebetulnya ga perlu pake @Column.
     private String synopsis;
 
-    @OneToMany(cascade = CascadeType.DETACH, mappedBy = "movie") // menunjukkan bahwa kelas Movie memiliki hubungan One To Many dengan Schedules
+    @OneToMany(
+            cascade = CascadeType.ALL,
+            mappedBy = "movie",
+            fetch = FetchType.LAZY
+    ) // menunjukkan bahwa kelas Movie memiliki hubungan One To Many dengan Schedules
     private List<Schedule> schedules;
 
 //    @Transient // Java akan skip field ini dan tidak direpresentasikan sebagai kolom di table.

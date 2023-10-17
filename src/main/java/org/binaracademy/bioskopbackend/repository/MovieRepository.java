@@ -49,6 +49,10 @@ public interface MovieRepository extends JpaRepository<Movie, String> {
     @Query(nativeQuery = true, value = "delete from movie where name = :name")
     void deleteMovieFromName(@Param("name") String name);
 
+    @Query(nativeQuery = true, value = "select * from movie " +
+            "left join schedule on schedule.movie_id = movie.id")
+    List<Movie> findMovieWithSchedule();
+
 //    Movie getMovieDetail()
 
 //    @Query(value = "select m from Movie m where m.schedule < :schedule and m.seat like %:seat% ")

@@ -9,6 +9,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
@@ -36,11 +37,14 @@ public class Schedule implements Serializable {
     @DateTimeFormat(pattern = "yyyy-MM-dd hh:mm:ss")
     private Date endTime;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "studio_id")
     private Studio studio;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne(
+//            cascade = CascadeType.ALL
+            fetch = FetchType.LAZY
+    )
     @JoinColumn(name = "movie_id") // joining column bisa pake joinColumn atau mappedBy pada @OneToMany
     private Movie movie;
 }

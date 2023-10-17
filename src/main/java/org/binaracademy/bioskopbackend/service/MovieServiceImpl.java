@@ -8,6 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 import java.util.List;
@@ -80,6 +82,11 @@ public class MovieServiceImpl implements MovieService {
     @Override
     public Page<Movie> getMoviePaged(int page) {
         return movieRepository.findAllWithPaging(PageRequest.of(page, 2));
+    }
+
+    @Override
+    public List<Movie> getAllMovieOri() {
+        return movieRepository.findMovieWithSchedule();
     }
 
     @Override

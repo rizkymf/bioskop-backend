@@ -12,6 +12,7 @@ import java.util.List;
 public interface MovieService {
 
     List<MovieResponse> getAllMovie();
+    List<Movie> getAllMovieOri();
     List<Movie> getMovieCurrentlyShowing(Date date);
     List<Movie> getMovieCurrentlyShowingWithFilterSeat(Date date, String seat);
     Boolean addNewMovie(Movie movie);
