@@ -26,6 +26,7 @@ public class MovieServiceImpl implements MovieService {
 
     @Override
     public List<MovieResponse> getAllMovie() {
+        log.info("Starting to get All movie");
         return movieRepository.findAll().stream()
                 .map(movie -> MovieResponse.builder()
                         .id(movie.getId())
@@ -70,6 +71,7 @@ public class MovieServiceImpl implements MovieService {
     @Override
     public MovieResponse getMovieDetail(String selectedMovieName) {
         // TODO : ambil data movie, berdasarkan nama movie nya
+        log.info("Getting movie detail info of {}", selectedMovieName);
         return Optional.ofNullable(movieRepository.findByName(selectedMovieName))
                 .map(movie -> MovieResponse.builder()
                         .id(movie.getId())

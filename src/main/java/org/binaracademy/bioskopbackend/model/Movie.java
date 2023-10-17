@@ -1,5 +1,6 @@
 package org.binaracademy.bioskopbackend.model;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -46,6 +47,7 @@ public class Movie implements Serializable {
 
 //    @Column(name = "name", length = 100) // Penanda column pada table sekaligus konfigurasi spec pada kolom tsb.
     @Column(name = "name", length = 100, unique = true)
+    @Schema(example = "Test Swagger")
     private String name;
 
     @Column(name = "movie_code", length = 20)
