@@ -12,6 +12,6 @@ import lombok.NoArgsConstructor;
 public class OrderDetail {
 
     private String productName;
-    private String quantity;
+    private Long quantity;
     private String price;
 }
