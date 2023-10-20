@@ -22,6 +22,7 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 import java.io.Serializable;
+import java.sql.Blob;
 import java.util.List;
 
 @Data
@@ -79,6 +80,8 @@ public class Movie implements Serializable {
 
     @Enumerated(EnumType.ORDINAL)
     private MoviePhase moviePhase;
+
+    private byte[] imageFile;
 
 
     // movie1, movie2, movie3

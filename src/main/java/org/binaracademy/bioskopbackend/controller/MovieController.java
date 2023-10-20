@@ -12,8 +12,12 @@ import org.binaracademy.bioskopbackend.model.response.MovieResponse;
 import org.binaracademy.bioskopbackend.model.response.Response;
 import org.binaracademy.bioskopbackend.service.MovieService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -23,11 +27,15 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -42,7 +50,7 @@ public class MovieController {
     MovieService movieService;
 
 //    @RequestMapping(value = "/get-movies", method = RequestMethod.GET, produces = "application/json")
-    @GetMapping(produces = "application/json")
+    @PostMapping(value = "/get-all-movies", produces = "application/json")
     @Operation(summary = "Api to get all movies")
     public List<MovieResponse> getMovies() {
         log.info("getting all movies in controller");
@@ -50,8 +58,11 @@ public class MovieController {
     }
 
 //    @RequestMapping(method = RequestMethod.POST, value = "/add", consumes = "application/json")
-    @PostMapping(consumes = "application/json", produces = "application/json")
-    public String addNewMovies(@RequestBody Movie movie) {
+    @PostMapping(value = "/add-movie")
+    public String addNewMovies(@RequestParam("image") MultipartFile imageFile, Movie movie) throws IOException {
+//        movieService.submitMovie(Movie.builder()
+//                .imageFile(imageFile.getBytes()).build());
+        movie.setImageFile(imageFile.getBytes());
         movieService.submitMovie(movie);
         return "Add new movies successful!";
     }
@@ -99,6 +110,17 @@ public class MovieController {
         log.info("Accept-Language - {}", acceptLanguage);
         movieService.updateMovieName(oldMovieName, newMovieName);
         return "update movie successful!";
+    }
+
+    @PostMapping(value = "/download-poster", produces = MediaType.IMAGE_JPEG_VALUE)
+    public ResponseEntity downloadPoster() {
+        return ResponseEntity.ok()
+//                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename=oppenheimer.jpg")
+                .body(movieService.getAllMovieOri().stream()
+                .filter(val -> Objects.nonNull(val.getImageFile()))
+                .map(Movie::getImageFile)
+                .findFirst()
+                .get());
     }
 
     private List<?> testWildCard() {
