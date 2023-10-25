@@ -93,12 +93,14 @@ public class MovieServiceImpl implements MovieService {
 
     @Override
     public Boolean submitMovie(Movie movie) {
-        try {
-            movieRepository.submitNewMovie(movie.getId(), movie.getName(), movie.getPosterImage(), movie.getSynopsis());
-            return true;
-        } catch(Exception e) {
-            return false;
-        }
+        movieRepository.save(movie);
+        return true;
+//        try {
+//            movieRepository.submitNewMovie(movie.getId(), movie.getName(), movie.getPosterImage(), movie.getSynopsis());
+//            return true;
+//        } catch(Exception e) {
+//            return false;
+//        }
     }
 
     @Override
