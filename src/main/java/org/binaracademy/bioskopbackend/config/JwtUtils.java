@@ -40,7 +40,7 @@ public class JwtUtils {
 
     public boolean validateJwtToken(String token) {
         try {
-            Jwts.parser().setSigningKey(jwtSecret).parseClaimsJwt(token);
+            Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(token);
             return true;
         } catch(Exception e) {
             log.error("Cannot validate jwt token: {}", e.getMessage());
