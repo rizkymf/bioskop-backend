@@ -11,7 +11,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 import org.springframework.stereotype.Service;
 
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
@@ -33,7 +32,6 @@ public class LoginRegisterServiceImpl implements LoginRegisterService{
         roles.add(roleRepository.findByRoleName(ERole.ROLE_CUSTOMER)
                 .orElseThrow(() -> new RuntimeException("Error: Role is not found")));
         userRepository.save(User.builder()
-//                        .email(oAuth2User.getAttributes().get("email").toString())
                         .password(oAuth2User.getAttributes().get("id").toString())
                         .provider("github")
                         .roles(roles)
@@ -45,15 +43,5 @@ public class LoginRegisterServiceImpl implements LoginRegisterService{
     public Optional<User> loginOauth2User(Authentication authentication) {
         DefaultOAuth2User oAuth2User = (DefaultOAuth2User) authentication.getPrincipal();
         return userRepository.findByUsername(oAuth2User.getAttributes().get("login").toString());
-//        Set<Roles> roles = new HashSet<>();
-//        roles.add(roleRepository.findByRoleName(ERole.ROLE_CUSTOMER)
-//                .orElseThrow(() -> new RuntimeException("Error: Role is not found")));
-//        userRepository.save(User.builder()
-//                        .email(oAuth2User.getAttributes().get("email").toString())
-//                .password(oAuth2User.getAttributes().get("id").toString())
-//                .provider("github")
-//                .roles(roles)
-//                .username(oAuth2User.getAttributes().get("login").toString())
-//                .build());
     }
 }
