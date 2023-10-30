@@ -16,19 +16,19 @@ public class Config {
     private String namaKelas; // ""
 
     Config(RoleRepository roleRepository) {
-        log.info("Cheking roles presented");
-        for(ERole c : ERole.values()) {
-            try {
-                Roles roles = roleRepository.findByRoleName(c)
-                        .orElseThrow(() -> new RuntimeException("Roles not found"));
-                log.info("Role {} has been found!", roles.getRoleName());
-            } catch(RuntimeException rte) {
-                log.info("Role {} is not found, inserting to DB . . .", c.name());
-                Roles roles = new Roles();
-                roles.setRoleName(c);
-                roleRepository.save(roles);
-            }
-        }
+//        log.info("Cheking roles presented");
+//        for(ERole c : ERole.values()) {
+//            try {
+//                Roles roles = roleRepository.findByRoleName(c)
+//                        .orElseThrow(() -> new RuntimeException("Roles not found"));
+//                log.info("Role {} has been found!", roles.getRoleName());
+//            } catch(RuntimeException rte) {
+//                log.info("Role {} is not found, inserting to DB . . .", c.name());
+//                Roles roles = new Roles();
+//                roles.setRoleName(c);
+//                roleRepository.save(roles);
+//            }
+//        }
     }
 
     @Bean

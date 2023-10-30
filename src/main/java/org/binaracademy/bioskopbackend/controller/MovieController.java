@@ -49,26 +49,26 @@ public class MovieController {
 //    @RequestMapping(value = "/get-movies", method = RequestMethod.GET, produces = "application/json")
     @PostMapping(value = "/get-all-movies", produces = "application/json")
     @Operation(summary = "Api to get all movies")
-    public List<MovieResponse> getMovies() {
+    public ResponseEntity<List<MovieResponse>> getMovies() {
         log.info("getting all movies in controller");
-        return movieService.getAllMovie();
+        return ResponseEntity.ok().body(movieService.getAllMovie());
     }
 
 //    @RequestMapping(method = RequestMethod.POST, value = "/add", consumes = "application/json")
     @PostMapping(value = "/add-movie")
     @Secured(value = "ROLE_ADMIN")
-    public String addNewMovies(@RequestParam("image") MultipartFile imageFile, Movie movie) throws IOException {
+    public ResponseEntity<String> addNewMovies(@RequestParam("image") MultipartFile imageFile, Movie movie) throws IOException {
 //        movieService.submitMovie(Movie.builder()
 //                .imageFile(imageFile.getBytes()).build());
         movie.setImageFile(imageFile.getBytes());
         movieService.submitMovie(movie);
-        return "Add new movies successful!";
+        return ResponseEntity.ok().body("Add new movies successful!");
     }
 
     @RequestMapping(method = RequestMethod.DELETE, value = "/delete/{movieName}")
-    public String deleteMovie(@PathVariable("movieName") String movieName) {
+    public ResponseEntity deleteMovie(@PathVariable("movieName") String movieName) {
         movieService.deleteMovieFromName(movieName);
-        return "Delete movie " + movieName + " success!";
+        return ResponseEntity.ok("Delete movie " + movieName + " success!");
     }
 
 //    @RequestMapping(method = RequestMethod.GET, value = "api/movies/detail")
@@ -101,13 +101,13 @@ public class MovieController {
     }
 
     @RequestMapping(method = RequestMethod.PUT, value = "/update/{movieName}")
-    public String updateMovie(@RequestParam("newMovieName") String newMovieName,
+    public ResponseEntity updateMovie(@RequestParam("newMovieName") String newMovieName,
             @PathVariable("movieName") String oldMovieName,
             @RequestHeader("Accept-Languange") String acceptLanguage,
             @RequestBody Movie movie) {
         log.info("Accept-Language - {}", acceptLanguage);
         movieService.updateMovieName(oldMovieName, newMovieName);
-        return "update movie successful!";
+        return ResponseEntity.ok("update movie successful!");
     }
 
     @PostMapping(value = "/download-poster", produces = MediaType.IMAGE_JPEG_VALUE)
