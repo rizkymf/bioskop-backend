@@ -13,8 +13,13 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
+import org.mockito.Mockito;
+import org.mockito.Spy;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,17 +29,18 @@ import java.util.Date;
 import java.util.List;
 
 @SpringBootTest
+@AutoConfigureMockMvc
 public class MovieServiceTest {
 
     @Autowired
-    MovieService movieService;
+    MovieServiceImpl movieService;
 
-    @Autowired
+    @SpyBean
     MovieRepository movieRepository;
 
     @BeforeEach
     void prepare() {
-        movieRepository.deleteAll();
+//        movieRepository.deleteAll();
     }
     @AfterEach
     void tearDown() {
@@ -159,5 +165,35 @@ public class MovieServiceTest {
         Assertions.assertEquals(1, movieActual.size());
         Assertions.assertEquals(1, movieActual.get(0).getSchedules().size());
         Assertions.assertNotNull(movieActual);
+    }
+
+    @Test
+    void testGetAllMovie_spy_success() {
+        Movie movie = Movie.builder()
+                .name("test 1")
+                .movieCode("test1")
+                .schedules(Arrays.asList(
+                        Schedule.builder()
+                                .startTime(new Date())
+                                .endTime(new Date())
+                                .build()
+                ))
+                .build();
+        movieRepository.save(movie);
+
+        Mockito.when(movieRepository.findAll()).thenReturn(Arrays.asList(Movie.builder()
+                .name("Spy Test")
+                .movieCode("spy_test")
+                .schedules(Arrays.asList(
+                        Schedule.builder()
+                                .startTime(new Date())
+                                .endTime(new Date())
+                                .build()
+                ))
+                .posterImage("spy test poster euy")
+                .build()));
+        List<MovieResponse> movieActual = movieService.getAllMovie();
+        Mockito.verify(movieRepository, Mockito.times(1)).findAll();
+        Assertions.assertEquals(1, movieActual.size());
     }
 }
