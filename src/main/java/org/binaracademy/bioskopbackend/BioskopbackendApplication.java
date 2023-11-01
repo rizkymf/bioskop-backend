@@ -12,6 +12,7 @@ public class BioskopbackendApplication {
 
 	public static void main(String[] args) throws ParseException {
 		SpringApplication.run(BioskopbackendApplication.class, args);
+		System.out.println("Ini hanyalah sebatas sout");
 	}
 
 }
