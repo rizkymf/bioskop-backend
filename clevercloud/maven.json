@@ -1,0 +1,19 @@
+{
+  "apps": [
+    {
+      "app_id": "app_7a4adb74-444d-490c-9b34-9b13896d0da6",
+      "org_id": "user_39a29103-acad-471d-a63a-bc877e503c0a",
+      "deploy_url": "https://push-n3-par-clevercloud-customers.services.clever-cloud.com/app_7a4adb74-444d-490c-9b34-9b13896d0da6.git",
+      "name": "bioskop-backend",
+      "alias": "bioskop-backend"
+    }
+  ],
+  "build": {
+    "type": "maven",
+    "goal": "package"
+  },
+  "deploy" : {
+    "jarName": "../target/bioskopbackend-0.0.1-SNAPSHOT.jar",
+    "goal": "-Dtest.active=false -Dexec.mainClass=\"org.binaracademy.bioskopbackend.BioskopBackendApplication\" assembly:jar-with-dependencies exec:java"
+  }
+}
