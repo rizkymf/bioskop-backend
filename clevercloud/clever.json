@@ -10,10 +10,10 @@
   ],
   "build": {
     "type": "maven",
-    "goal": "build"
+    "goal": "package"
   },
   "deploy" : {
-    "jarName": "target/bioskopbackend-0.0.1-SNAPSHOT.jar",
-    "goal": "yourgoal"
+    "jarName": "../target/bioskopbackend-0.0.1-SNAPSHOT.jar",
+    "goal": "-Dtest.active=false -Dexec.mainClass=\"org.binaracademy.bioskopbackend.BioskopBackendApplication\" assembly:jar-with-dependencies exec:java"
   }
 }
