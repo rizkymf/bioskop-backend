@@ -20,10 +20,13 @@ import java.util.List;
 import java.util.Map;
 
 @Service
-//@Slf4j
+@Slf4j
 public class InvoiceServiceImpl implements InvoiceService{
 
-    private static Logger log = LoggerFactory.getLogger(InvoiceServiceImpl.class);
+    /**
+     * log bisa diinitialize juga dengan cara dibawah ini
+     */
+//    private static Logger log = LoggerFactory.getLogger(InvoiceServiceImpl.class);
 
     @Override
     public byte[] generateInvoice(String username) throws FileNotFoundException, JRException {
