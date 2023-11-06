@@ -5,11 +5,11 @@ import org.binaracademy.bioskopbackend.config.JwtUtils;
 import org.binaracademy.bioskopbackend.enumeration.ERole;
 import org.binaracademy.bioskopbackend.model.Roles;
 import org.binaracademy.bioskopbackend.model.User;
-import org.binaracademy.bioskopbackend.model.UserDetailsImpl;
 import org.binaracademy.bioskopbackend.model.request.LoginRequest;
 import org.binaracademy.bioskopbackend.model.request.SignupRequest;
 import org.binaracademy.bioskopbackend.model.response.JwtResponse;
 import org.binaracademy.bioskopbackend.model.response.MessageResponse;
+import org.binaracademy.bioskopbackend.model.response.UserResponse;
 import org.binaracademy.bioskopbackend.repository.RoleRepository;
 import org.binaracademy.bioskopbackend.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -69,7 +69,7 @@ public class AuthController {
         SecurityContextHolder.getContext().setAuthentication(authentication);
         String jwt = jwtUtils.generateJwtToken(authentication);
 
-        UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
+        UserResponse userDetails = (UserResponse) authentication.getPrincipal();
         List<String> roles = userDetails.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.toList());

@@ -2,6 +2,7 @@ package org.binaracademy.bioskopbackend.service;
 
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
+import lombok.Synchronized;
 import lombok.extern.slf4j.Slf4j;
 import org.binaracademy.bioskopbackend.model.Movie;
 import org.binaracademy.bioskopbackend.model.Schedule;
@@ -10,6 +11,7 @@ import org.binaracademy.bioskopbackend.repository.MovieRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,6 +21,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -28,9 +31,15 @@ public class MovieServiceImpl implements MovieService {
     @Autowired
     private MovieRepository movieRepository;
 
+    @Async
     @Override
     public List<MovieResponse> getAllMovie() {
         log.info("Starting to get All movie");
+        try {
+            Thread.sleep(5000l);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
         return movieRepository.findAll().stream()
                 .map(movie -> MovieResponse.builder()
                         .id(movie.getId())
@@ -39,6 +48,10 @@ public class MovieServiceImpl implements MovieService {
                         .build())
                 .collect(Collectors.toList());
     }
+
+//    public CompletableFuture getAllMovieAsync() {
+//
+//    }
 
     @Override
     public List<Movie> getMovieCurrentlyShowing(Date date) {

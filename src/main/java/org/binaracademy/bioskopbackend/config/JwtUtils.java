@@ -3,7 +3,8 @@ package org.binaracademy.bioskopbackend.config;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import lombok.extern.slf4j.Slf4j;
-import org.binaracademy.bioskopbackend.model.UserDetailsImpl;
+//import org.binaracademy.bioskopbackend.model.UserDetailsImpl;
+import org.binaracademy.bioskopbackend.model.response.UserResponse;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
@@ -21,7 +22,7 @@ public class JwtUtils {
     private int jwtExpirationMs;
 
     public String generateJwtToken(Authentication authentication) {
-        UserDetailsImpl userPrincipal = (UserDetailsImpl) authentication.getPrincipal();
+        UserResponse userPrincipal = (UserResponse) authentication.getPrincipal();
         return Jwts.builder()
                 .setSubject(userPrincipal.getUsername())
                 .setIssuedAt(new Date())
