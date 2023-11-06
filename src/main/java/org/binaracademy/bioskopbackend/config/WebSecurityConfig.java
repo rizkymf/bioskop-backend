@@ -3,7 +3,7 @@ package org.binaracademy.bioskopbackend.config;
 import lombok.extern.slf4j.Slf4j;
 import org.binaracademy.bioskopbackend.enumeration.ERole;
 import org.binaracademy.bioskopbackend.service.LoginRegisterService;
-import org.binaracademy.bioskopbackend.service.UserDetailsServiceImpl;
+import org.binaracademy.bioskopbackend.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -14,6 +14,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
@@ -26,7 +27,7 @@ import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Autowired
-    UserDetailsServiceImpl userDetailsService;
+    UserDetailsService userDetailsService;
 
     @Autowired
     AuthEntryPointJwt unauthorizedHandler;
@@ -45,8 +46,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
                 .authorizeRequests()
                 .antMatchers("/**", "/api/auth/**", "/swagger-ui.html", "/swagger-ui/**", "/v3/api-docs/**", "/webjars/**", "/error").permitAll( )
-                .antMatchers("/api/invoice/**").hasAuthority(ERole.ROLE_ADMIN.name())
-                .antMatchers("/api/movies/**").hasAuthority(ERole.ROLE_CUSTOMER.name())
+//                .antMatchers("/api/invoice/**").hasAuthority(ERole.ROLE_ADMIN.name())
+//                .antMatchers("/api/movies/**").hasAuthority(ERole.ROLE_CUSTOMER.name())
                 .anyRequest()
                 .authenticated()
                 .and()
@@ -57,8 +58,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                     };
                 })
                 .and()
-                .csrf(c -> c
-                        .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()))
+//                .csrf(c -> c
+//                        .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()))
                 .logout(l -> l.logoutSuccessUrl("/"));
         http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
     }
