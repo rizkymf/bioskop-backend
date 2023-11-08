@@ -21,5 +21,6 @@ public interface MovieService {
     Boolean submitMovie(Movie movie);
     Boolean updateMovieName(String oldName, String newName);
     Boolean deleteMovieFromName(String name);
+    Boolean updateMovie(String oldMovieId, Movie newMovie);
 
 }

@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -127,6 +128,15 @@ public class MovieController {
     public ResponseEntity getBasedOnDate(@RequestParam("date") @DateTimeFormat(pattern = "yyyy-MM-dd") Date date) {
         return ResponseEntity.ok()
                 .body(null);
+    }
+
+    @PutMapping(value = "/update")
+    public ResponseEntity updateMovie(@RequestParam("movieId") String movieId, @RequestBody Movie newMovie) {
+        if(movieService.updateMovie(movieId, newMovie)){
+            return ResponseEntity.ok()
+                    .body("Update of movieId " + movieId + " successful!");
+        };
+        return ResponseEntity.internalServerError().body("Something went wrong!");
     }
 
     private List<?> testWildCard() {

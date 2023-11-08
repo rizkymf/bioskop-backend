@@ -1,5 +1,6 @@
 package org.binaracademy.bioskopbackend.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -32,9 +33,11 @@ public class Schedule implements Serializable {
     private String scheduleId;
 
     @DateTimeFormat(pattern = "yyyy-MM-dd hh:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd hh:mm:ss")
     private Date startTime;
 
     @DateTimeFormat(pattern = "yyyy-MM-dd hh:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd hh:mm:ss")
     private Date endTime;
 
     @ManyToOne(fetch = FetchType.LAZY)

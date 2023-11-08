@@ -8,6 +8,7 @@ import org.binaracademy.bioskopbackend.model.Movie;
 import org.binaracademy.bioskopbackend.model.Schedule;
 import org.binaracademy.bioskopbackend.model.response.MovieResponse;
 import org.binaracademy.bioskopbackend.repository.MovieRepository;
+import org.binaracademy.bioskopbackend.repository.ScheduleRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -30,6 +31,9 @@ public class MovieServiceImpl implements MovieService {
 
     @Autowired
     private MovieRepository movieRepository;
+
+    @Autowired
+    private ScheduleRepository scheduleRepository;
 
     @Async
     @Override
@@ -140,6 +144,36 @@ public class MovieServiceImpl implements MovieService {
             e.printStackTrace();
         }
         return false;
+    }
+
+    @Transactional(rollbackFor = {NullPointerException.class})
+    @Override
+    public Boolean updateMovie(String oldMovieId, Movie newMovie) {
+        log.info("Updating movie of id : {}", oldMovieId);
+        // Get oldMovie to update
+        Movie oldMovie = movieRepository.findById(oldMovieId).orElse(null);
+        if(!Optional.ofNullable(oldMovie).isPresent()) {
+            return Boolean.FALSE;
+        }
+
+        // Delete old Schedule
+        scheduleRepository.deleteByMovieId(oldMovieId);
+
+        try {
+            int a = 10;
+            if(a == 10) {
+                int b = a/0;
+            }
+        } catch(Exception e) {
+            return Boolean.FALSE;
+        }
+
+        newMovie.setId(oldMovieId);
+        // update movie
+        movieRepository.save(newMovie);
+        // insert schedule
+
+        return Boolean.TRUE;
     }
 
 }
