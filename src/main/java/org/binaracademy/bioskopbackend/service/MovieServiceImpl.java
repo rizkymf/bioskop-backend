@@ -1,11 +1,7 @@
 package org.binaracademy.bioskopbackend.service;
 
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
-import lombok.Synchronized;
 import lombok.extern.slf4j.Slf4j;
 import org.binaracademy.bioskopbackend.model.Movie;
-import org.binaracademy.bioskopbackend.model.Schedule;
 import org.binaracademy.bioskopbackend.model.response.MovieResponse;
 import org.binaracademy.bioskopbackend.repository.MovieRepository;
 import org.binaracademy.bioskopbackend.repository.ScheduleRepository;
@@ -13,19 +9,20 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 
 @Slf4j
+@Transactional
 @Service
 public class MovieServiceImpl implements MovieService {
 
@@ -35,15 +32,9 @@ public class MovieServiceImpl implements MovieService {
     @Autowired
     private ScheduleRepository scheduleRepository;
 
-    @Async
     @Override
     public List<MovieResponse> getAllMovie() {
         log.info("Starting to get All movie");
-        try {
-            Thread.sleep(5000l);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
         return movieRepository.findAll().stream()
                 .map(movie -> MovieResponse.builder()
                         .id(movie.getId())
@@ -57,6 +48,7 @@ public class MovieServiceImpl implements MovieService {
 //
 //    }
 
+    @Transactional(readOnly = true)
     @Override
     public List<Movie> getMovieCurrentlyShowing(Date date) {
         Date requestDate = Optional.ofNullable(date)
@@ -65,15 +57,18 @@ public class MovieServiceImpl implements MovieService {
         return movies;
     }
 
+    @Transactional(readOnly = true)
     @Override
     public List<Movie> getMovieCurrentlyShowingWithFilterSeat(Date date, String seat) {
         return null;
     }
 
+    @Async
+    @Transactional
     @Override
-    public Boolean addNewMovie(Movie movie) {
-        log.info("Trying to save new movie");
-        return Optional.ofNullable(movie)
+    public void addNewMovie(Movie movie) {
+        log.info("Trying to save new movie {}", movie.getName());
+        Optional.ofNullable(movie)
                 .map(newMovie -> movieRepository.save(movie))
                 .map(result -> {
                     boolean isSuccess = Objects.nonNull(result);
@@ -89,6 +84,7 @@ public class MovieServiceImpl implements MovieService {
                 });
     }
 
+    @Transactional(readOnly = true)
     @Override
     public MovieResponse getMovieDetail(String selectedMovieName) {
         // TODO : ambil data movie, berdasarkan nama movie nya
@@ -102,21 +98,23 @@ public class MovieServiceImpl implements MovieService {
                 .orElse(null);
     }
 
+    @Transactional(readOnly = true)
     @Override
     public Page<Movie> getMoviePaged(int page) {
         return movieRepository.findAllWithPaging(PageRequest.of(page, 2));
     }
 
+    @Transactional(readOnly = true)
     @Override
     public List<Movie> getAllMovieOri() {
         return movieRepository.findMovieWithSchedule();
     }
 
+    @Async
     @Override
-    public Boolean submitMovie(Movie movie) {
+    public void submitMovie(Movie movie) throws InterruptedException {
         movieRepository.save(movie);
-        return true;
-//        try {
+        //        try {
 //            movieRepository.submitNewMovie(movie.getId(), movie.getName(), movie.getPosterImage(), movie.getSynopsis());
 //            return true;
 //        } catch(Exception e) {
@@ -159,14 +157,14 @@ public class MovieServiceImpl implements MovieService {
         // Delete old Schedule
         scheduleRepository.deleteByMovieId(oldMovieId);
 
-        try {
-            int a = 10;
-            if(a == 10) {
-                int b = a/0;
-            }
-        } catch(Exception e) {
-            return Boolean.FALSE;
-        }
+//        try {
+//            int a = 10;
+//            if(a == 10) {
+//                int b = a/0;
+//            }
+//        } catch(Exception e) {
+//            return Boolean.FALSE;
+//        }
 
         newMovie.setId(oldMovieId);
         // update movie
@@ -174,6 +172,21 @@ public class MovieServiceImpl implements MovieService {
         // insert schedule
 
         return Boolean.TRUE;
+    }
+
+    @Override
+    public CompletableFuture<MovieResponse> getMovieDetailAsync(String selectedMovieName) {
+        return null;
+    }
+
+    @Override
+    public Future<MovieResponse> getMovieDetailFuture(String selectedMovieName) {
+        return null;
+    }
+
+    @Scheduled(cron = "* 28 * * * *")
+    public void scheduleExample() {
+        log.info("message ini scheduling coy");
     }
 
 }

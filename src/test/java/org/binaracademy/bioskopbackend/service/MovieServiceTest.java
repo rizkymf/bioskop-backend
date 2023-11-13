@@ -109,7 +109,7 @@ public class MovieServiceTest {
     }
 
     @Test
-    void testSubmitMovie_success() {
+    void testSubmitMovie_success() throws InterruptedException {
         movieService.submitMovie(Movie.builder()
                         .id("testId")
                 .synopsis("Synopsis")

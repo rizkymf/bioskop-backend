@@ -1,13 +1,17 @@
 package org.binaracademy.bioskopbackend.controller;
 
+import com.google.firebase.messaging.FirebaseMessagingException;
 import lombok.extern.slf4j.Slf4j;
 import org.binaracademy.bioskopbackend.model.Movie;
 import org.binaracademy.bioskopbackend.model.response.MovieResponse;
+import org.binaracademy.bioskopbackend.service.FirebaseServiceImpl;
 import org.binaracademy.bioskopbackend.service.MovieService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -21,6 +25,9 @@ public class DemoController {
     // buat service
     @Autowired
     MovieService movieService;
+
+    @Autowired
+    FirebaseServiceImpl firebaseService;
     // buat controller
 
     @GetMapping(value = "/multi-thread")
@@ -68,6 +75,13 @@ public class DemoController {
         List<MovieResponse> movies = movieService.getAllMovie();
         System.out.println(movieService.getMovieDetail(movies.get(0).getName()).getId());
         return ResponseEntity.ok("ok");
+    }
+
+    @PostMapping(value = "/firebase/publish")
+    public ResponseEntity publishToTopicFireBase(@RequestParam String message) throws FirebaseMessagingException {
+        firebaseService.sendMsg(message);
+        return ResponseEntity.ok()
+                .body("Success publish to topic firebase");
     }
 
 }

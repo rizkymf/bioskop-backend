@@ -7,6 +7,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Future;
 
 @Service
 public interface MovieService {
@@ -15,12 +17,13 @@ public interface MovieService {
     List<Movie> getAllMovieOri();
     List<Movie> getMovieCurrentlyShowing(Date date);
     List<Movie> getMovieCurrentlyShowingWithFilterSeat(Date date, String seat);
-    Boolean addNewMovie(Movie movie);
+    void addNewMovie(Movie movie);
     MovieResponse getMovieDetail(String selectedMovieName);
     Page<Movie> getMoviePaged(int page);
-    Boolean submitMovie(Movie movie);
+    void submitMovie(Movie movie) throws InterruptedException;
     Boolean updateMovieName(String oldName, String newName);
     Boolean deleteMovieFromName(String name);
     Boolean updateMovie(String oldMovieId, Movie newMovie);
-
+    CompletableFuture<MovieResponse> getMovieDetailAsync(String selectedMovieName);
+    Future<MovieResponse> getMovieDetailFuture(String selectedMovieName);
 }

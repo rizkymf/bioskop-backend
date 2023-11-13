@@ -38,6 +38,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
 
 @CrossOrigin("*")
@@ -57,13 +60,14 @@ public class MovieController {
         return ResponseEntity.ok().body(movieService.getAllMovie());
     }
 
-//    @RequestMapping(method = RequestMethod.POST, value = "/add", consumes = "application/json")
+//    @RequestMapping(method = Request
+//    Method.POST, value = "/add", consumes = "application/json")
+//    @Secured(value = "ROLE_ADMIN")
     @PostMapping(value = "/add-movie")
-    @Secured(value = "ROLE_ADMIN")
-    public ResponseEntity<String> addNewMovies(@RequestParam("image") MultipartFile imageFile, @RequestBody Movie movie) throws IOException {
+    public ResponseEntity<String> addNewMovies(@RequestBody Movie movie) throws IOException, InterruptedException {
 //        movieService.submitMovie(Movie.builder()
 //                .imageFile(imageFile.getBytes()).build());
-        movie.setImageFile(imageFile.getBytes());
+//        movie.setImageFile(imageFile.getBytes());
         movieService.submitMovie(movie);
         return ResponseEntity.ok().body("Add new movies successful!");
     }
@@ -137,6 +141,13 @@ public class MovieController {
                     .body("Update of movieId " + movieId + " successful!");
         };
         return ResponseEntity.internalServerError().body("Something went wrong!");
+    }
+
+    @GetMapping(value = "/get-async")
+    public ResponseEntity getDetailAsync(@RequestParam String movieName) throws ExecutionException, InterruptedException, TimeoutException {
+//        movieService.getMovieDetailFuture(movieName).
+        return ResponseEntity.ok(movieService.getMovieDetailAsync(movieName)
+                .get(10l, TimeUnit.SECONDS));
     }
 
     private List<?> testWildCard() {
