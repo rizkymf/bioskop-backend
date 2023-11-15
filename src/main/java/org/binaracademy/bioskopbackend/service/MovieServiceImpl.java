@@ -2,13 +2,17 @@ package org.binaracademy.bioskopbackend.service;
 
 import lombok.extern.slf4j.Slf4j;
 import org.binaracademy.bioskopbackend.model.Movie;
+import org.binaracademy.bioskopbackend.model.User;
+import org.binaracademy.bioskopbackend.model.response.InvoiceResponse;
 import org.binaracademy.bioskopbackend.model.response.MovieResponse;
 import org.binaracademy.bioskopbackend.repository.MovieRepository;
 import org.binaracademy.bioskopbackend.repository.ScheduleRepository;
+import org.binaracademy.bioskopbackend.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.AsyncResult;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,6 +22,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 
@@ -31,6 +36,9 @@ public class MovieServiceImpl implements MovieService {
 
     @Autowired
     private ScheduleRepository scheduleRepository;
+
+    @Autowired
+    private UserRepository userRepository;
 
     @Override
     public List<MovieResponse> getAllMovie() {
@@ -112,14 +120,14 @@ public class MovieServiceImpl implements MovieService {
 
     @Async
     @Override
-    public void submitMovie(Movie movie) throws InterruptedException {
-        movieRepository.save(movie);
-        //        try {
-//            movieRepository.submitNewMovie(movie.getId(), movie.getName(), movie.getPosterImage(), movie.getSynopsis());
-//            return true;
-//        } catch(Exception e) {
-//            return false;
-//        }
+    public Future<Boolean> submitMovie(Movie movie) throws InterruptedException {
+//        movieRepository.save(movie);
+        try {
+            movieRepository.submitNewMovie(movie.getId(), movie.getName(), movie.getPosterImage(), movie.getSynopsis());
+            return new AsyncResult<>(Boolean.TRUE);
+        } catch(Exception e) {
+            return new AsyncResult<>(Boolean.FALSE);
+        }
     }
 
     @Override
@@ -174,14 +182,36 @@ public class MovieServiceImpl implements MovieService {
         return Boolean.TRUE;
     }
 
+    @Async
     @Override
     public CompletableFuture<MovieResponse> getMovieDetailAsync(String selectedMovieName) {
         return null;
     }
 
     @Override
-    public Future<MovieResponse> getMovieDetailFuture(String selectedMovieName) {
-        return null;
+    public InvoiceResponse getMovieDetailFuture(String selectedMovieName, String username) throws ExecutionException, InterruptedException {
+        return CompletableFuture.allOf(this.getMovie(selectedMovieName), this.getUser(username))
+                .thenApplyAsync(__ -> {
+                    Movie movie = this.getMovie(selectedMovieName).join();
+                    User user = this.getUser(username).join();
+                    return InvoiceResponse.builder()
+                            .userEmail(user.getEmail())
+                            .username(user.getUsername())
+                            .movieName(movie.getName())
+                            .synopsis(movie.getSynopsis())
+                            .build();
+                }).get();
+    }
+
+    @Async
+    private CompletableFuture<User> getUser(String username) {
+        return CompletableFuture.supplyAsync(() -> userRepository.findByUsername(username)
+                    .orElse(null));
+    }
+
+    @Async
+    private CompletableFuture<Movie> getMovie(String movieName) {
+        return CompletableFuture.supplyAsync(() -> movieRepository.findByName(movieName));
     }
 
     @Scheduled(cron = "* 28 * * * *")

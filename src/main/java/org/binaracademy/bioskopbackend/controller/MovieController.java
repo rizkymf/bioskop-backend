@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.extern.slf4j.Slf4j;
 import org.binaracademy.bioskopbackend.model.Movie;
 import org.binaracademy.bioskopbackend.model.response.ErrorResponse;
+import org.binaracademy.bioskopbackend.model.response.InvoiceResponse;
 import org.binaracademy.bioskopbackend.model.response.MovieResponse;
 import org.binaracademy.bioskopbackend.model.response.Response;
 import org.binaracademy.bioskopbackend.service.MovieService;
@@ -64,12 +65,14 @@ public class MovieController {
 //    Method.POST, value = "/add", consumes = "application/json")
 //    @Secured(value = "ROLE_ADMIN")
     @PostMapping(value = "/add-movie")
-    public ResponseEntity<String> addNewMovies(@RequestBody Movie movie) throws IOException, InterruptedException {
+    public ResponseEntity<String> addNewMovies(@RequestBody Movie movie) throws IOException, InterruptedException, ExecutionException {
 //        movieService.submitMovie(Movie.builder()
 //                .imageFile(imageFile.getBytes()).build());
 //        movie.setImageFile(imageFile.getBytes());
-        movieService.submitMovie(movie);
-        return ResponseEntity.ok().body("Add new movies successful!");
+        if(movieService.submitMovie(movie).get()) {
+            return ResponseEntity.ok().body("Add new movies successful!");
+        };
+        return ResponseEntity.internalServerError().body("Movie addition failed");
     }
 
     @RequestMapping(method = RequestMethod.DELETE, value = "/delete/{movieName}")
@@ -148,6 +151,14 @@ public class MovieController {
 //        movieService.getMovieDetailFuture(movieName).
         return ResponseEntity.ok(movieService.getMovieDetailAsync(movieName)
                 .get(10l, TimeUnit.SECONDS));
+    }
+
+    @PostMapping(value = "/ticket", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity printTicket(@RequestHeader("user") String username,
+            @RequestParam("movie") String movieName) throws ExecutionException, InterruptedException {
+        InvoiceResponse response = movieService.getMovieDetailFuture(movieName, username);
+        return ResponseEntity.ok()
+                .body(response);
     }
 
     private List<?> testWildCard() {
