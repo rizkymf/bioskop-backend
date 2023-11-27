@@ -56,7 +56,11 @@ public class MovieController {
 //    @RequestMapping(value = "/get-movies", method = RequestMethod.GET, produces = "application/json")
     @PostMapping(value = "/get-all-movies", produces = "application/json")
     @Operation(summary = "Api to get all movies")
-    public ResponseEntity<List<MovieResponse>> getMovies() {
+    public ResponseEntity<List<MovieResponse>> getMovies(
+            @RequestHeader String user,
+            @RequestParam String param,
+            @RequestBody Movie movie
+    ) {
         log.info("getting all movies in controller");
         return ResponseEntity.ok().body(movieService.getAllMovie());
     }

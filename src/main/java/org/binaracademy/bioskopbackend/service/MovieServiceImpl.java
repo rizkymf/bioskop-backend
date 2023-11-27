@@ -200,6 +200,9 @@ public class MovieServiceImpl implements MovieService {
                             .movieName(movie.getName())
                             .synopsis(movie.getSynopsis())
                             .build();
+                }).exceptionally(throwable -> {
+                    log.error("Error! because {}", throwable.getMessage());
+                    return null;
                 }).get();
     }
 

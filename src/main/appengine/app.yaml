@@ -1,0 +1,8 @@
+runtime: java11
+manual_scaling:
+  instances: 1
+instance_class: B1
+env_variables:
+  database_postgres_url: kandula.db.elephantsql.com
+  database_postgres_username: ywlbegkv
+  database_postgres_password: <password>
