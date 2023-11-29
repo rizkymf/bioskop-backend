@@ -1,0 +1,34 @@
+package org.binaracademy.bioskopbackend.service;
+
+import com.cloudinary.Cloudinary;
+import com.cloudinary.utils.ObjectUtils;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
+import java.util.Map;
+
+@Slf4j
+@RequiredArgsConstructor
+@Service
+public class CloudinaryServiceImpl implements CloudinaryService{
+
+    private final Cloudinary cloudinary;
+
+    @Override
+    public void upload(MultipartFile multipartFile) {
+
+        try {
+            Map<?, ?> uploadResult = cloudinary.uploader().upload(multipartFile.getBytes(),
+                    ObjectUtils.asMap(multipartFile.getName(), multipartFile.getName()));
+            String imageUrl = uploadResult.get("url").toString();
+            String imageUrlSecure = uploadResult.get("secure_url").toString();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
+}

@@ -3,6 +3,7 @@ package org.binaracademy.bioskopbackend.controller;
 import lombok.extern.slf4j.Slf4j;
 import org.binaracademy.bioskopbackend.model.request.EmailRequest;
 import org.binaracademy.bioskopbackend.model.response.MovieResponse;
+import org.binaracademy.bioskopbackend.service.CloudinaryService;
 import org.binaracademy.bioskopbackend.service.EmailService;
 //import org.binaracademy.bioskopbackend.service.FirebaseServiceImpl;
 import org.binaracademy.bioskopbackend.service.MovieService;
@@ -15,8 +16,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @RestController
@@ -33,7 +40,9 @@ public class DemoController {
 
     @Autowired
     EmailService emailService;
-    // buat controller
+
+    @Autowired
+    CloudinaryService cloudinaryService;
 
     @GetMapping(value = "/multi-thread")
     public ResponseEntity getMultiThread() {
@@ -107,6 +116,16 @@ public class DemoController {
         String baseUrl = "rapidapi.com";
         return restTemplate.getForEntity("https://imdb8.p.rapidapi.com/title/get-most-popular-movies?homeCountry=US&purchaseCountry=US&currentCountry=US",String.class);
 //        return null;
+    }
+
+    @PostMapping(value = "/upload-image")
+    public String testUploadImage(@RequestParam MultipartFile image) throws IOException {
+        File file = new File(image.getOriginalFilename());
+        FileOutputStream os = new FileOutputStream(file);
+        os.write(image.getBytes());
+        os.close();
+        cloudinaryService.upload(image);
+        return "upload success";
     }
 
 }
