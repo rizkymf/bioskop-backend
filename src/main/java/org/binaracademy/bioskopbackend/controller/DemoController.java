@@ -2,6 +2,7 @@ package org.binaracademy.bioskopbackend.controller;
 
 import lombok.extern.slf4j.Slf4j;
 import org.binaracademy.bioskopbackend.model.request.EmailRequest;
+import org.binaracademy.bioskopbackend.model.request.UploadImageRequest;
 import org.binaracademy.bioskopbackend.model.response.MovieResponse;
 import org.binaracademy.bioskopbackend.service.CloudinaryService;
 import org.binaracademy.bioskopbackend.service.EmailService;
@@ -10,6 +11,7 @@ import org.binaracademy.bioskopbackend.service.MovieService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -24,6 +26,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @Slf4j
 @RestController
@@ -119,13 +122,14 @@ public class DemoController {
     }
 
     @PostMapping(value = "/upload-image")
-    public String testUploadImage(@RequestParam MultipartFile image) throws IOException {
-        File file = new File(image.getOriginalFilename());
-        FileOutputStream os = new FileOutputStream(file);
-        os.write(image.getBytes());
-        os.close();
-        cloudinaryService.upload(image);
-        return "upload success";
+    public String testUploadImage(@ModelAttribute UploadImageRequest request) throws IOException {
+        log.info("uploader name : {}", request.getUploaderName());
+        log.info("file name : {}", request.getFileName());
+        return Optional.ofNullable(request)
+                .map(UploadImageRequest::getMultipartFile)
+                .filter(file -> !file.isEmpty())
+                .map(file -> cloudinaryService.upload(file))
+                .orElse("Upload failed");
     }
 
 }

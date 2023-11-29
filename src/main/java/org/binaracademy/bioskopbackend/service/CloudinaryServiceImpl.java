@@ -19,16 +19,17 @@ public class CloudinaryServiceImpl implements CloudinaryService{
     private final Cloudinary cloudinary;
 
     @Override
-    public void upload(MultipartFile multipartFile) {
+    public String upload(MultipartFile multipartFile) {
 
         try {
             Map<?, ?> uploadResult = cloudinary.uploader().upload(multipartFile.getBytes(),
-                    ObjectUtils.asMap(multipartFile.getName(), multipartFile.getName()));
+                    ObjectUtils.emptyMap());
             String imageUrl = uploadResult.get("url").toString();
             String imageUrlSecure = uploadResult.get("secure_url").toString();
+            return imageUrl;
         } catch (IOException e) {
             e.printStackTrace();
         }
-
+        return null;
     }
 }
