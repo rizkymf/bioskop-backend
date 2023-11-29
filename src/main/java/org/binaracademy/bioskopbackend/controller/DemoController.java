@@ -1,26 +1,21 @@
 package org.binaracademy.bioskopbackend.controller;
 
-import com.google.firebase.messaging.FirebaseMessagingException;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
-import org.binaracademy.bioskopbackend.model.Movie;
+import org.binaracademy.bioskopbackend.model.request.EmailRequest;
 import org.binaracademy.bioskopbackend.model.response.MovieResponse;
 import org.binaracademy.bioskopbackend.service.EmailService;
-import org.binaracademy.bioskopbackend.service.EmailServiceImpl;
 //import org.binaracademy.bioskopbackend.service.FirebaseServiceImpl;
 import org.binaracademy.bioskopbackend.service.MovieService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 
-import java.net.URI;
 import java.util.List;
 
 @Slf4j
@@ -95,9 +90,8 @@ public class DemoController {
 //    }
 
     @PostMapping(value = "/send-email")
-    public ResponseEntity sendEmail(@RequestParam String subject, @RequestParam String message,
-            @RequestParam String recipientEmail) {
-        emailService.sendEmail(subject, message, recipientEmail);
+    public ResponseEntity sendEmail(@RequestBody EmailRequest request) {
+        emailService.sendEmail(request);
         return ResponseEntity.ok().body("Email sent!");
     }
 

@@ -3,6 +3,8 @@ manual_scaling:
   instances: 1
 instance_class: B1
 env_variables:
-  database_postgres_url: kandula.db.elephantsql.com
-  database_postgres_username: ywlbegkv
-  database_postgres_password: <password>
+  database_postgres_url: <db-url>
+  database_postgres_username: <db-username
+  database_postgres_password: <db-password>
+  email_account: <account-email>
+  email_password: <app-password>
