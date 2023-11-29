@@ -4,7 +4,7 @@ manual_scaling:
 instance_class: B1
 env_variables:
   database_postgres_url: <db-url>
-  database_postgres_username: <db-username
+  database_postgres_username: <db-username>
   database_postgres_password: <db-password>
   email_account: <account-email>
   email_password: <app-password>
